@@ -1,0 +1,2 @@
+# django
+pieces of diango
