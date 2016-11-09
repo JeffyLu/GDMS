@@ -5,3 +5,4 @@ pieces of diango
 0003 基本表单数据    
 0004 查看request的META属性    
 0005 基础配置    
+0006 修改后台app的显示名称
