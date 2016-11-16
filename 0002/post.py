@@ -1,4 +1,4 @@
-#提交post请求
+#post方法提交表单的基本框架
 def post_func(request):
     if request.method == 'POST':
         form = MyForm(request.POST)
@@ -11,8 +11,7 @@ def post_func(request):
             do something
             '''
             #提交后跳转或者其他
-            return
-    #非post 
+            return 
     else:
         form = MyForm()
     context = {
