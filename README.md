@@ -6,3 +6,5 @@ pieces of diango
 0004 查看request的META属性    
 0005 基础配置    
 0006 修改后台app的显示名称    
+0007 admin后台的一些定制     
+0008 models的一些方法    
