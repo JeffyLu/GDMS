@@ -22,6 +22,24 @@ class MyModel(models.Model):
         blank = True,
         null = True,
     )
+    
+    #保存限制
+    def save(self, *args, **kwargs):
+        if self.start_time >= self.end_time:
+            return False
+        else:
+            super(Time, self).save(*args, **kwargs)
+
+    #时间比较
+    @property
+    def is_available_time(self):
+        now = datetime.datetime.now()
+        start = self.start_time.replace(tzinfo = None)
+        end = self.end_time.replace(tzinfo = None)
+        if now > end or now < start:
+            return False
+        else:
+            return True
 
     @property
     def get_set(self):
