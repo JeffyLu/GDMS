@@ -56,6 +56,24 @@ class model1Admin(admin.ModelAdmin):
         ('块名', {'fields' : ['属性', '属性',]}),
     ]
 
+    #过滤后台外键下拉列表
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
 
+        department = get_department(request)
+
+        if department is not None:
+            #属性名
+            if db_field.name == 'department':
+                #默认值
+                kwargs['initial'] = department
+                #过滤下拉列表
+                kwargs['queryset'] = Department.objects.filter(
+                    name = department.name
+                )
+        return super(NoticeAdmin, self).formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
 admin.site.register(moedl1, model1Admin)
 
