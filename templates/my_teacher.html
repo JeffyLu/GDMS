@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}我的导师{% endblock %}
+{% block bodytitle %}我的导师{% endblock %}
+{% block body %}
+<table>
+  {% if teacher %}
+  <thead><tr>
+    <th>姓名 </th>
+    <th>职称 </th>
+    <th>院系 </th>
+    <th>教研室 </th>
+    <th>联系方式 </th>
+    <th>名额(已确认/可选)</th>
+    <th>已选人数</th>
+    <th>导师确认</th>
+    <th>选项</th>
+  </tr></thead>
+  <tbody><tr class="form-row {% cycle "row1" "row2" %}">
+    <form method="post">
+      {% csrf_token %}
+    <td>{{ teacher.get_name}}</td>
+    <td>{{ teacher.t_title }}</td>
+    <td>{{ teacher.t_department }}</td>
+    <td>{{ teacher.t_office }}</td>
+    <td>{{ teacher.t_contact }}</td>
+    <td>{{ teacher.get_confirmed }}/{{ teacher.t_maxchoice }}</td>
+    <td>{{ teacher.get_choosed }}</td>
+    <td>{{ status }}</td>
+    <td>
+      {% if system_is_available and not user.studentinfo.s_isconfirm %}
+      <input type="submit" title="取消选择此导师" name="cancel" value="取消选择"/>
+      {% endif %}
+    </td></tbody>
+    </form>
+  </tr>
+  {% else %}
+    <div>暂无记录!</div>
+  {% endif %}
+</table> 
+{% endblock %}

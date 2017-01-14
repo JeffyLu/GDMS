@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}我的学生{% endblock %}
+{% block bodytitle %}我的学生{% endblock %}
+{% block body %}
+<table>
+  {% if students %}
+  <thead><tr>
+    <th>院系 </th>
+    <th>专业</th>
+    <th>年级 </th>
+    <th>学号 </th>
+    <th>姓名 </th>
+    <th>选项</th>
+    
+  </tr></thead>
+  <tbody>
+   {% for student in students %}
+   <tr class="form-row {% cycle "row1" "row2" %}">
+    <form method="post">
+      {% csrf_token %}
+    <td>{{ student.s_department }}</td>
+    <td>{{ student.s_major }}</td>
+    <td>{{ student.s_year }}</td>
+    <td>{{ student.s_id }}</td>
+    <td>{{ student.get_name }}</td>
+    <td>
+      {% if student.s_year in available_years %}
+      <input type="hidden" name="student" value="{{ student.s_id }}"/>
+      {% if not student.s_isconfirm %}
+      {% if user.teacherinfo.get_confirmed < user.teacherinfo.t_maxchoice%}
+      <input type="submit" title="确认此学生" name="confirm" value="确认"/>
+      {% endif %}
+      {% else %}
+      <input type="submit" title="取消此学生" name="cancel" value="取消"/>
+      {% endif %}
+      {% endif %}
+    </td>
+    </form>
+    </tr>
+    {% endfor %}
+    </tbody>
+  {% else %}
+    <div>暂无记录!</div>
+  {% endif %}
+</table> 
+{% if user.teacherinfo %}
+<div>
+  <h5>
+  可选人数:{{ user.teacherinfo.t_maxchoice }}&emsp;&emsp;
+  已选人数:{{ user.teacherinfo.get_choosed }}&emsp;&emsp;
+  确认人数:{{ user.teacherinfo.get_confirmed }}
+  </h5>
+</div>
+{% endif %}
+{% endblock %}

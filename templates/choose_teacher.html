@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}选择导师{% endblock %}
+{% block bodytitle %}选择导师{% endblock %}
+{% block body %}
+{% if teachers %}
+<table>
+  <thead><tr>
+    <th>姓名 </th>
+    <th>职称 </th>
+    <th>院系 </th>
+    <th>教研室 </th>
+    <th>联系方式 </th>
+    <th>名额(已确认/可选)</th>
+    <th>已选人数</th>
+    <th>选项</th>
+  </tr></thead>
+  <tbody>
+  {% for teacher in teachers %}
+  <tr class="form-row {% cycle "row1" "row2" %}">
+    <form method="post">
+      {% csrf_token %}
+    <td>{{ teacher.get_name}}</td>
+    <td>{{ teacher.t_title }}</td>
+    <td>{{ teacher.t_department }}</td>
+    <td>{{ teacher.t_office }}</td>
+    <td>{{ teacher.t_contact }}</td>
+    <td>{{ teacher.get_confirmed }}/{{ teacher.t_maxchoice }}</td>
+    <td>{{ teacher.get_choosed }}</td>
+    <td>
+			{% if system_is_available %}
+				{% if not user.studentinfo.s_teacher %}
+					<input type="hidden" name="teacher" value="{{ teacher.t_id }}"/>
+					<input type="submit" title="选择此导师" name="choose" value="选择"/>
+				{% endif %}
+			{% endif %}
+		</td>
+    </form>
+  </tr>
+  {% endfor %}
+    <tbody>
+</table> 
+
+<div class="pagination">
+  <span class="step-links">
+    {% if teachers.has_previous %}
+		<a href="?page={{ teachers.page.1 }}">首页</a>
+    <a href="?page={{ teachers.previous_page_number }}">上一页</a>
+    {% endif %}
+    <span class="current">
+      第{{ teachers.number }}页, 共 {{ teachers.paginator.num_pages }}页.
+    </span>
+    {% if teachers.has_next %}
+    <a href="?page={{ teachers.next_page_number }}">下一页</a>
+		<a href="?page={{ teachers.paginator.num_pages }}">尾页</a>
+		{% endif %}
+  </span>
+</div> 
+
+  {% else %}
+  <div>暂无记录!</div>
+{% endif %}
+{% endblock %}

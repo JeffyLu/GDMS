@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}主页{% endblock %}
+{% block bodytitle %}重要通知{% endblock %}
+{% block body %}
+{% if latest_notice %}
+<table>
+  <thead><tr>
+   <th>标题</th>
+   <th>概要内容</th>
+   <th>发布时间</th>
+  </tr></thead>
+  <tbody>
+		{% for notice in latest_notice %}
+		<tr class="form-row {% cycle "row1" "row2" %}">
+		<td><a href="{% url 'detail' notice.id %}">{{ notice.title }}</a></td>
+    <td>{{ notice.get_bref }}</td>
+		<td>{{ notice.pub_date }}</td>
+		{% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <div>暂无记录!</div>
+{% endif %}
+{% endblock %}

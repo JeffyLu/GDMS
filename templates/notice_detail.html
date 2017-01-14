@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}公告详情{% endblock %}
+{% block bodytitle %}公告详情{% endblock %}
+{% block body %}
+<div>
+  <fieldset class="module aligned ">
+    {% if notice %}
+      <div class="form-row field-title">
+        <div>
+          <label>标题:</label>
+          <p>{{ notice.title }}</p>
+        </div>
+      </div>
+      
+      <div class="form-row field-pub_date">
+        <div>
+          <label>发布时间:</label>
+          <p>{{ notice.pub_date }}</p>
+        </div>
+      </div>
+      
+      <div class="form-row field-detail">
+        <div>
+          <label>详细内容:</label>
+          <p>{{ notice.detail }}</p>
+        </div>
+      </div>
+    {% else %}
+      <div><p>公告不存在!</p></div>
+    {% endif %}
+  </fieldset>
+</div>    
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}公告{% endblock %}
+{% block bodytitle %}公告栏{% endblock %}
+{% block body %}
+{% if notices %}
+<table>
+  <thead><tr>
+   <th>标题</th>
+   <th>概要内容</th>
+   <th>发布时间</th>
+  </tr></thead>
+  <tbody>
+		{% for notice in notices %}
+		<tr class="form-row {% cycle "row1" "row2" %}">
+		<td><a href="{% url 'detail' notice.id %}">{{ notice.title }}</a></td>
+    <td>{{ notice.get_bref }}</td>
+		<td>{{ notice.pub_date }}</td>
+		{% endfor %}
+  </tbody>
+</table>
+<div class="pagination">
+  <span class="step-links">
+    {% if notices.has_previous %}
+		<a href="?page={{ notice.page.1}}">首页</a>
+    <a href="?page={{ notices.previous_page_number }}">上一页</a>
+    {% endif %}
+    <span class="current">
+      第{{ notices.number }}页, 共 {{ notices.paginator.num_pages }}页.
+    </span>
+    {% if notices.has_next %}
+    <a href="?page={{ notices.next_page_number }}">下一页</a>
+		<a href="?page={{ notices.paginator.num_pages }}">尾页</a>
+    {% endif %}
+  </span>
+</div>
+{% else %}
+  <div>暂无记录!</div>
+{% endif %}
+{% endblock %}

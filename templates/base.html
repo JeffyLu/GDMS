@@ -1,0 +1,65 @@
+{% load static %}<!DOCTYPE html>
+<html lang="zh-hans"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<head>
+  <title> {% block title %}{% endblock %} </title>
+  <link rel="stylesheet" type="text/css" href="{% static "index/base.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "index/forms.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "index/changelists.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "index/fonts.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "index/widgets.css" %}" />
+  <script type="text/javascript" src="{% static "index/core.js" %}"></script>
+  <script type="text/javascript" src="{% static "index/jquery.js" %}"></script>
+  <script type="text/javascript" src="{% static "index/jquery.init.js" %}"></script>
+  <script type="text/javascript" src="{% static "index/RelatedObjectLookups.js" %}"></script>
+  <script type="text/javascript" src="{% static "index/actions.js" %}"></script>
+  <script type="text/javascript" src="{% static "index/urlify.js" %}"></script>
+  <script type="text/javascript" src="{% static "index/prepopulate.js" %}"></script>
+  <script type="text/javascript" src="{% static "index/xregexp.js" %}"></script>
+</head>
+
+<body>
+<div id="container">
+  <div id="header">
+    <div id="branding">
+      <h1 id="site-name">福建师范大学毕业设计管理系统</h1>
+    </div>
+    <div id="user-tools">
+      欢迎, 
+      <strong>{{ user }}, {{ user.first_name }}</strong>
+      {% if user.is_superuser or perms.department.is_manager %}
+        <a href="{% url 'admin:index' %}"> 后台管理 </a>/ 
+      {% elif perms.student.is_student %}
+        <a href="{% url 'admin:index' %}student/studentinfo/{{ user.id }}"> 帐号管理 </a>/ 
+      {% elif perms.teacher.is_teacher %}
+        <a href="{% url 'admin:index' %}teacher/teacherinfo/{{ user.id }}"> 帐号管理 </a>/ 
+      {% endif %}
+   
+      <a href="{% url 'logout' %}"> 注销 </a>
+      </div>
+  </div>
+  
+  <div class="breadcrumbs">
+    <a href="{% url 'home' %}"> 主页 </a>
+    <a style="margin-left: 20px;">|</a>
+    <a style="margin-left: 20px;" href="{% url 'notice' %}"> 公告 </a>
+    <a style="margin-left: 20px;">|</a>
+    <a style="margin-left: 20px;" href="{% url 'choose_teacher' %}"> 选择导师 </a>
+    {% if perms.student.is_student %}
+    <a style="margin-left: 20px;">|</a>
+    <a style="margin-left: 20px;" href="{% url 'my_teacher' %}"> 我的导师 </a>
+    {% endif %}
+    {% if perms.teacher.is_teacher %}
+    <a style="margin-left: 20px;">|</a>
+    <a style="margin-left: 20px;" href="{% url 'my_student' %}"> 我的学生 </a>
+    {% endif %}
+  </div>
+  <div id="content" class="flex">
+	<h1>{% block bodytitle %}{% endblock %}</h1>
+    {% block body %}{% endblock %}
+  </div>
+
+</div>
+</body>
+
+</html>
