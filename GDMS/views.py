@@ -1,26 +1,25 @@
+import xlrd
+
 from django.shortcuts import render, HttpResponse
-from notice.models import Notice
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.views import login
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db import IntegrityError
+
 from student.models import StudentInfo
 from teacher.models import TeacherInfo
-from department.models import *
+from notice.models import Notice
+from department.models import Department, Office, Major, Year
 from department.views import get_department
-import xlrd
-from django.contrib.auth.views import login, logout
-# Create your views here.
 
 
-#登录限制
+# 登录限制
 def limited_login(request):
     if 'username' in request.POST:
         username = request.POST['username']
-        try:
-            user = User.objects.get(username = username)
-        except:
-            user = None
+        user = User.objects.filter(username=username).first()
     else:
         user = None
 
@@ -40,36 +39,31 @@ def limited_login(request):
     return rep
 
 
-#首页
+# 首页
 @login_required
-@staff_member_required(login_url = 'login')
+@staff_member_required(login_url='login')
 def index(request):
-
     department = get_department(request)
     if department is not None:
         latest_notice = Notice.objects.filter(
-            department = department
-        ).order_by('-pub_date')[:3]
+            department=department).order_by('-pub_date')[:3]
     else:
         latest_notice = Notice.objects.order_by('-pub_date')[:3]
 
-    context = {
-        'latest_notice' : latest_notice,
-    }
-
+    context = {'latest_notice': latest_notice}
     return render(request, 'index.html', context)
 
 
-#获取表格
+# 获取表格
 def get_xls_table(sheet_name):
     try:
         data = xlrd.open_workbook('GDMS/data.xls')
-    except:
+    except Exception:
         return None
     return data.sheet_by_name(sheet_name)
 
 
-#行迭代生成器
+# 行迭代生成器
 def get_xls_line(sheet_name):
     table = get_xls_table(sheet_name)
     if table is None:
@@ -78,7 +72,7 @@ def get_xls_line(sheet_name):
         yield table.row_values(r)
 
 
-#添加学院、专业、教研室、年级
+# 添加学院、专业、教研室、年级
 def add_basis():
     s_table = get_xls_table('students')
     t_table = get_xls_table('teachers')
@@ -91,89 +85,87 @@ def add_basis():
 
     for d in set(department):
         try:
-            Department.objects.create(name = d)
-        except:
+            Department.objects.create(name=d)
+        except IntegrityError:
             continue
 
     for o in set(zip(t_department, office)):
         try:
             Office.objects.create(
-                department = Department.objects.get(name = o[0]),
-                name = o[1]
+                department=Department.objects.get(name=o[0]),
+                name=o[1],
             )
-        except:
+        except IntegrityError:
             continue
 
     for m in set(zip(s_department, major)):
         try:
             Major.objects.create(
-                department = Department.objects.get(name = m[0]),
-                name = m[1]
+                department=Department.objects.get(name=m[0]),
+                name=m[1]
             )
-        except:
+        except IntegrityError:
             continue
 
     for y in set(year):
         try:
-            Year.objects.create(value = int(y))
-        except:
+            Year.objects.create(value=int(y))
+        except IntegrityError:
             continue
 
 
-#添加教师
+# 添加教师
 def add_teachers():
     values = get_xls_line('teachers')
     if values is None:
         return False
 
     for line in values:
-        (department, office, username,
-         name, title, contact, maxchoice) = line
+        (department, office, username, name, title, contact, maxchoice) = line
 
         try:
             teacher = User.objects.create_user(
-                username = username,
-                password = 'asdfasdfasdf',
-                first_name = name,
+                username=username,
+                password='asdfasdfasdf',
+                first_name=name,
             )
-        except:
-            teacher = User.objects.get(username = username)
+        except IntegrityError:
+            teacher = User.objects.get(username=username)
         finally:
-           teacher.is_staff = True
-           teacher.groups.add(Group.objects.get(name='teachers'))
-           teacher.save()
+            teacher.is_staff = True
+            teacher.groups.add(Group.objects.get(name='teachers'))
+            teacher.save()
 
         try:
             TeacherInfo.objects.create(
-                t_id = teacher,
-                t_department = Department.objects.get(name = department),
-                t_office = Office.objects.get(name = office),
-                t_title = title,
-                t_contact = contact,
-                t_maxchoice = int(maxchoice),
+                t_id=teacher,
+                t_department=Department.objects.get(name=department),
+                t_office=Office.objects.get(name=office),
+                t_title=title,
+                t_contact=contact,
+                t_maxchoice=int(maxchoice),
             )
-        except:
+        except IntegrityError:
             pass
 
 
-#添加学生
+# 添加学生
 def add_students():
     values = get_xls_line('students')
     if values is None:
         return False
 
     for line in values:
-        (department, major, year,
-         username, name, contact) = line
+        (department, major, year, username, name, contact) = line
 
         try:
             student = User.objects.create_user(
-                username = username,
-                password = 'asdfasdfasdf',
-                first_name = name,
+                username=username,
+                password='asdfasdfasdf',
+                first_name=name,
             )
-        except:
-            student = User.objects.get(username = username)
+        except IntegrityError:
+            student = User.objects.get(username=username)
         finally:
             student.is_staff = True
             student.groups.add(Group.objects.get(name='students'))
@@ -181,20 +173,19 @@ def add_students():
 
         try:
             StudentInfo.objects.create(
-                s_id = student,
-                s_department = Department.objects.get(name = department),
-                s_major = Major.objects.get(name = major),
-                s_year = Year.objects.get(value = year),
-                s_contact = contact,
+                s_id=student,
+                s_department=Department.objects.get(name=department),
+                s_major=Major.objects.get(name=major),
+                s_year=Year.objects.get(value=year),
+                s_contact=contact,
             )
-        except:
+        except IntegrityError:
             pass
 
 
-#导入数据
+# 导入数据
 @permission_required('is_superuser')
 def add(request):
-
     add_basis()
     add_teachers()
     add_students()

@@ -1,7 +1,3 @@
-from django.shortcuts import render
-
-# Create your views here.
-
 def get_department(request):
     '''获取当前用户所在学院'''
 
@@ -14,7 +10,5 @@ def get_department(request):
             return request.user.manager.m_department
         else:
             return None
-    except:
+    except Exception:
         return None
-
-
