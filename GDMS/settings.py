@@ -57,9 +57,9 @@ WSGI_APPLICATION = 'GDMS.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'GDMS',
-        'USER': 'GDMSuser',
-        'PASSWORD': 'GDMSpwd',
+        'NAME': 'gdms',
+        'USER': 'root',
+        'PASSWORD': 'root123456',
         'HOST': 'localhost',
         'PORT': '3306',
     }
